@@ -15,7 +15,19 @@ Fava Budget Freedom 是一个 [Fava](https://beancount.github.io/fava/) 的扩�
 
 ### 1. 安装插件
 
-确保 `fava_budget_freedom` 目录在你的 Python 路径中。
+你可以通过 pip 直接从 GitHub 安装：
+
+```bash
+pip install git+https://github.com/Leon2xiaowu/fava_budget_freedom.git
+```
+
+或者，如果你下载了源码，也可以在源码目录安装：
+
+```bash
+pip install .
+```
+
+确保安装后 `fava_budget_freedom` 在你的 Python 环境中可用。
 
 ### 2. 配置 Beancount
 
