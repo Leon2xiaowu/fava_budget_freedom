@@ -7,7 +7,7 @@ name = "fava-budget-freedom"
 version = "0.1.0"
 description = "A Fava extension for wildcard budget matching"
 authors = [
-    {name = "User", email = "user@example.com"},
+    {name = "LeonWu", email = "leon2xiaowu@hotmail.com"},
 ]
 dependencies = [
     "fava>=1.26",
