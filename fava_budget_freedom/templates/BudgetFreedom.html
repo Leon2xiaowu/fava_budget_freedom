@@ -1,0 +1,59 @@
+{% extends "_layout.html" %} {% block content %}
+<div class="headerline">
+  <h1>{{ extension.report_title }}</h1>
+</div>
+
+<div class="content">
+  {% set report = extension.generate_budget_report() %}
+  {% set report_data = report.report_data %}
+  
+  {% if report.range_start %}
+  <div style="margin-bottom: 1em; color: #666;">
+    <strong>Date Range:</strong> {{ report.range_start }} - {{ report.range_end }}
+  </div>
+  {% else %}
+  <div style="margin-bottom: 1em; color: #666;">
+    <strong>Date Range:</strong> All Time
+  </div>
+  {% endif %}
+
+  {% if not report_data %}
+  <p>No budget definitions found. Add <code>custom "budget" "Pattern" "Amount Currency" "Period"</code> to your beancount file.</p>
+  <p>Example: <code>2025-01-01 custom "budget" "Expenses:Food:*" "2000 CNY" "monthly"</code></p>
+  {% else %}
+  <table class="sortable">
+    <thead>
+      <tr>
+        <th>Account Pattern</th>
+        <th>Period</th>
+        <th>Rollover</th>
+        <th class="num">Budget</th>
+        <th class="num">Actual</th>
+        <th class="num">Usage</th>
+        <th>Progress</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in report_data %}
+      <tr>
+        <td><a href="{{ url_for('account', name=row.account_name) }}" onclick="window.open(this.href); return false;">{{ row.pattern }}</a></td>
+        <td>{{ row.period }}</td>
+        <td style="text-align: center;">{% if row.is_rollover %}Yes{% else %}No{% endif %}</td>
+        <td class="num">{{ row.budget.number }} {{ row.budget.currency }}</td>
+        <td class="num">{{ row.actual.number }} {{ row.actual.currency }}</td>
+        <td class="num">{{ "%.1f"|format(row.percent) }}%</td>
+        <td>
+          <div style="width: 200px; background-color: #eee; height: 10px; border-radius: 5px; overflow: hidden; position: relative;" {% if row.time_percent is not none %}title="Ideal: {{ "%.1f"|format(row.time_percent) }}%"{% endif %}>
+            <div style="width: {{ [row.percent, 100]|min }}%; background-color: {% if row.time_percent is not none %}{% if row.percent <= row.time_percent %}#5cb85c{% elif row.percent <= row.time_percent + 10 %}#f0ad4e{% else %}#d9534f{% endif %}{% else %}{% if row.percent > 100 %}#d9534f{% else %}#5cb85c{% endif %}{% endif %}; height: 100%;"></div>
+            {% if row.time_percent is not none %}
+            <div style="position: absolute; left: {{ row.time_percent }}%; top: 0; bottom: 0; border-left: 1px solid #333; opacity: 0.7;"></div>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

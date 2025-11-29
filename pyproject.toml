@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fava-budget-freedom"
+version = "0.1.0"
+description = "A Fava extension for wildcard budget matching"
+authors = [
+    {name = "User", email = "user@example.com"},
+]
+dependencies = [
+    "fava>=1.26",
+    "beancount>=2.3.5",
+]
+
+[project.entry-points."fava.plugins"]
+"fava_budget_freedom" = "fava_budget_freedom:BudgetFreedom"
