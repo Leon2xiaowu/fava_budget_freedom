@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import timedelta
 from beancount.core.amount import Amount
 from beancount.core.inventory import Inventory
 from fava.ext import FavaExtensionBase
@@ -44,11 +45,21 @@ class BudgetFreedom(FavaExtensionBase):
             budgets, entries, report_start, report_end, time_percent,
             usage_calculator_report, budget_calculator
         )
+        
+        total_budget_row = None
+        final_report_data = []
+        
+        for row in report_data:
+            if row['pattern'] == "Expenses:*":
+                total_budget_row = row
+            else:
+                final_report_data.append(row)
             
         return {
-            'report_data': report_data,
+            'report_data': final_report_data,
             'range_start': report_start,
-            'range_end': report_end
+            'range_end': report_end,
+            'total_budget_row': total_budget_row
         }
 
     def _generate_report_rows(self, budgets, entries, report_start, report_end, time_percent, usage_calculator, budget_calculator):
@@ -106,6 +117,7 @@ class BudgetFreedom(FavaExtensionBase):
         for pattern in budgets:
             latest_budget = latest_budgets[pattern]
             effective_budget = adjusted_budgets[pattern]
+            gross_budget = effective_budgets[pattern]
             rollover = rollovers[pattern]
 
             # Get actual usage from the pre-calculated map
@@ -117,14 +129,27 @@ class BudgetFreedom(FavaExtensionBase):
             if effective_budget.number != 0:
                 percent = (actual_val / effective_budget.number) * 100
             
+            # Calculate total actual usage for gross percent (including children)
+            total_actual = usage_calculator.calculate_usage_for_period(
+                report_start, report_end + timedelta(days=1), pattern, gross_budget.currency
+            )
+            total_actual_val = total_actual.number if total_actual.number is not None else Decimal(0)
+
+            gross_percent = 0
+            if gross_budget.number != 0:
+                gross_percent = (total_actual_val / gross_budget.number) * 100
+            
             account_name = clean_pattern_for_link(pattern)
 
             report_data.append({
                 'pattern': pattern,
                 'account_name': account_name,
                 'budget': effective_budget,
+                'unadjusted_budget': gross_budget,
                 'actual': actual_amount,
+                'total_actual': total_actual,
                 'percent': percent,
+                'unadjusted_percent': gross_percent,
                 'time_percent': time_percent,
                 'period': latest_budget['period'],
                 'rollover': rollover,

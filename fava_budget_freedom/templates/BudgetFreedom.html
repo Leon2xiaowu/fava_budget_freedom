@@ -1,4 +1,4 @@
-{% extends "_layout.html" %} {% block content %}
+{% block content %}
 <div class="headerline">
   <h1>{{ extension.report_title }}</h1>
 </div>
@@ -14,6 +14,28 @@
   {% else %}
   <div style="margin-bottom: 1em; color: #666;">
     <strong>Date Range:</strong> All Time
+  </div>
+  {% endif %}
+
+  {% if report.total_budget_row %}
+  <div style="margin-bottom: 2em; padding: 1.5em; background-color: var(--sidebar-background); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border);">
+      <h2 style="margin-top: 0; margin-bottom: 1em; font-size: 1.2em; color: var(--text-color);">Total Budget Overview</h2>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+          <div>
+              <div style="font-size: 2em; font-weight: bold;">{{ "%.2f"|format(report.total_budget_row.unadjusted_budget.number) }} {{ report.total_budget_row.unadjusted_budget.currency }}</div>
+              <div style="color: var(--text-color-lighter); font-size: 0.9em;">Total Planned Budget</div>
+          </div>
+          <div style="text-align: right;">
+              <div style="font-size: 2em; font-weight: bold; color: {% if report.total_budget_row.unadjusted_percent > 100 %}#d9534f{% else %}#5cb85c{% endif %};">{{ "%.2f"|format(report.total_budget_row.unadjusted_percent) }}%</div>
+              <div style="color: var(--text-color-lighter); font-size: 0.9em;">Consumed ({{ "%.2f"|format(report.total_budget_row.total_actual.number) }} {{ report.total_budget_row.total_actual.currency }})</div>
+          </div>
+      </div>
+      <div style="width: 100%; background-color: var(--gray); height: 12px; border-radius: 6px; overflow: hidden; position: relative;">
+          <div style="width: {{ [report.total_budget_row.unadjusted_percent, 100]|min }}%; background-color: {% if report.total_budget_row.unadjusted_percent > 100 %}#d9534f{% else %}#5cb85c{% endif %}; height: 100%;"></div>
+          {% if report.total_budget_row.time_percent is not none %}
+          <div style="position: absolute; left: {{ report.total_budget_row.time_percent }}%; top: 0; bottom: 0; border-left: 2px solid #333; opacity: 0.5;" title="Time Passed: {{ "%.2f"|format(report.total_budget_row.time_percent) }}%"></div>
+          {% endif %}
+      </div>
   </div>
   {% endif %}
 
@@ -39,11 +61,11 @@
         <td><a href="{{ url_for('account', name=row.account_name) }}" onclick="window.open(this.href); return false;">{{ row.pattern }}</a></td>
         <td>{{ row.period }}</td>
         <td style="text-align: center;">{% if row.is_rollover %}Yes{% else %}No{% endif %}</td>
-        <td class="num">{{ row.budget.number }} {{ row.budget.currency }}</td>
-        <td class="num">{{ row.actual.number }} {{ row.actual.currency }}</td>
-        <td class="num">{{ "%.1f"|format(row.percent) }}%</td>
+        <td class="num">{{ "%.2f"|format(row.budget.number) }} {{ row.budget.currency }}</td>
+        <td class="num">{{ "%.2f"|format(row.actual.number) }} {{ row.actual.currency }}</td>
+        <td class="num">{{ "%.2f"|format(row.percent) }}%</td>
         <td>
-          <div style="width: 200px; background-color: #eee; height: 10px; border-radius: 5px; overflow: hidden; position: relative;" {% if row.time_percent is not none %}title="Ideal: {{ "%.1f"|format(row.time_percent) }}%"{% endif %}>
+          <div style="width: 200px; background-color: var(--gray); height: 10px; border-radius: 5px; overflow: hidden; position: relative;" {% if row.time_percent is not none %}title="Ideal: {{ "%.2f"|format(row.time_percent) }}%"{% endif %}>
             <div style="width: {{ [row.percent, 100]|min }}%; background-color: {% if row.time_percent is not none %}{% if row.percent <= row.time_percent %}#5cb85c{% elif row.percent <= row.time_percent + 10 %}#f0ad4e{% else %}#d9534f{% endif %}{% else %}{% if row.percent > 100 %}#d9534f{% else %}#5cb85c{% endif %}{% endif %}; height: 100%;"></div>
             {% if row.time_percent is not none %}
             <div style="position: absolute; left: {{ row.time_percent }}%; top: 0; bottom: 0; border-left: 1px solid #333; opacity: 0.7;"></div>
