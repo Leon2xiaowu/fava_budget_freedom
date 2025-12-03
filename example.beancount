@@ -7,9 +7,11 @@ option "operating_currency" "USD"
 2024-01-01 open Expenses:Food:Groceries USD
 2024-01-01 open Expenses:Food:Dining USD
 2024-01-01 open Expenses:Transport:Bus USD
+2024-01-01 open Expenses:Child USD
 
 2024-01-01 custom "budget" "Expenses:Food" "monthly" 1000 USD "rollover" 
 
+2025-01-01 custom "budget" "Expenses:*" "yearly" 40000 USD  
 2025-01-01 custom "budget" "Expenses:Food" "monthly" 2000 USD "rollover" 
 
 2024-01-02 * "Grocery Store"
@@ -27,3 +29,8 @@ option "operating_currency" "USD"
 2025-03-04 * "Bus Ticket"
   Expenses:Food:Dining    1000.00 USD
   Assets:Cash              -1000.00 USD
+
+
+2025-10-03 * "Restaurant"
+  Expenses:Child      2000.00 USD
+  Assets:Cash              -2000.00 USD
